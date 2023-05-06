@@ -5,7 +5,7 @@ const { Song } = require("../models/Song.js");
 const { faker } = require("@faker-js/faker");
 
 // Creamos 50 songs aleatoriamente y los vamos añadiendo al array de songs:
-const bookList = [];
+const songList = [];
 
 for (let i = 0; i < 50; i++) {
   const newSong = {
@@ -14,16 +14,16 @@ for (let i = 0; i < 50; i++) {
     releaseYear: faker.date.betweens("1965-01-01T00:00:00.000Z", "2021-01-01T00:00:00.000Z", 1),
   };
 
-  // Añadimos el book a nuestra array de songs:
-  bookList.push(newSong);
+  // Añadimos el song a nuestra array de songs:
+  songList.push(newSong);
 }
 
 //  Función de reseteo de documentos de la colección.
 const resetSongs = async () => {
   try {
-    await Song.collection.drop(); //  Esperamos a que borre los documentos de la colección book de la BBDD.
+    await Song.collection.drop(); //  Esperamos a que borre los documentos de la colección song de la BBDD.
     console.log("Borrados songs");
-    await Song.insertMany(bookList); //  Esperamos a que inserte los nuevos documentos creados en la colección book de la BBDD.
+    await Song.insertMany(songList); //  Esperamos a que inserte los nuevos documentos creados en la colección song de la BBDD.
     console.log("Creados songs correctamente");
   } catch (error) {
     //  Si hay error lanzamos el error por consola.

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const { connect } = require("../db");
 
 // Importamos la función que nos sirve para relacionar los documentos de nuestra BBDD:
-const { playListRelations } = require("../utils/playListRelations");
+const { playListRelations } = require("../utils/playListRelations.js");
 
 //  Función asíncrona para conectar con la BBDD y ejecutar la función de reseteo de datos.
 const playListRelationsSeed = async () => {

@@ -15,7 +15,7 @@ const { resetSongs } = require("../utils/resetSongs.js");
 
 // Importamos la función que nos sirve para resetear las relaciones entre las coleciones:
 const { playListRelations } = require("../utils/playListRelations.js");
-const { Artist } = require("../models/Artist.js");
+
 const { resetArtists } = require("../utils/resetArtists.js");
 
 // Router propio de playList suministrado por express.Router:
@@ -39,7 +39,6 @@ router.get("/", async (req, res) => {
     const playlistArray = await Playlist.find() // Devolvemos los playLists si funciona. Con modelo.find().
       .populate([
         "createdBy",
-        "songs",
         {
           path: "songs",
           populate: { path: "artist" },
@@ -134,6 +133,39 @@ router.get("/name/:name", async (req, res) => {
 
 // Ejemplo de REQ:
 // http://localhost:3000/playList/title/titulo del libro a buscar
+//  ------------------------------------------------------------------------------------------
+
+//  Endpoint para añadir una song de  una playlist :
+
+router.post("/:id/song", async (req, res) => {
+  // Si funciona la escritura...
+  try {
+    const id = req.params.id; //  Recogemos el id de los parametros de la ruta.
+    const playlist = await Playlist.findById(id);
+    if (playlist) {
+      const songId = req.body.songId;
+      if (songId) {
+        if (!playlist.songs.includes(songId)) {
+          playlist.songs.push(songId);
+          const updatedPlaylist = await playlist.save();
+          return res.json(updatedPlaylist);
+        } else {
+          res.status(409).json({ message: "Song already exists" });
+        }
+      } else {
+        res.status(400).json({ message: "Song ID is required" });
+      }
+    } else {
+      res.status(404).json({});
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+/* Petición tipo de POST para añadir un nuevo playList (añadimos al body el nuevo playList con sus propiedades que tiene que cumplir con el Scheme de nuestro modelo) identificado por su id:
+ const newPlaylist = {title: "Prueba title", pages: 255}
+ fetch("http://localhost:3000/playList/",{"body": JSON.stringify(newPlaylist),"method":"POST","headers":{"Accept":"application/json","Content-Type":"application/json"}}).then((data)=> console.log(data)) */
 
 //  ------------------------------------------------------------------------------------------
 
@@ -146,6 +178,35 @@ router.post("/", async (req, res) => {
     const createdPlaylist = await playList.save(); // Esperamos a que guarde el nuevo playList creado en caso de que vaya bien. Con el metodo .save().
     return res.status(201).json(createdPlaylist); // Devolvemos un código 201 que significa que algo se ha creado y el playList creado en modo json.
 
+    // Si falla la escritura...
+  } catch (error) {
+    res.status(500).json(error); //  Devolvemos un código de error 500 si falla la escritura y el error.
+  }
+});
+
+/* Petición tipo de POST para añadir un nuevo playList (añadimos al body el nuevo playList con sus propiedades que tiene que cumplir con el Scheme de nuestro modelo) identificado por su id:
+ const newPlaylist = {title: "Prueba title", pages: 255}
+ fetch("http://localhost:3000/playList/",{"body": JSON.stringify(newPlaylist),"method":"POST","headers":{"Accept":"application/json","Content-Type":"application/json"}}).then((data)=> console.log(data)) */
+
+//  ------------------------------------------------------------------------------------------
+
+//  Endpoint para eliminar una song de  una playlist :
+
+router.post("/:id/song", async (req, res) => {
+  // Si funciona la escritura...
+  try {
+    const id = req.params.id; //  Recogemos el id de los parametros de la ruta.
+    const playList = await Playlist.findById(id);
+
+    if (playList) {
+      const song = req.body.song;
+
+      playList.songs.splice(song);
+      const createdPlaylist = await playList.save();
+      res.json(createdPlaylist); //  Devolvemos el playList actualizado en caso de que exista con ese id.
+    } else {
+      res.status(404).json({}); //  emos un código 404 y un objeto vacio en caso de que no exista con ese id.
+    }
     // Si falla la escritura...
   } catch (error) {
     res.status(500).json(error); //  Devolvemos un código de error 500 si falla la escritura y el error.
