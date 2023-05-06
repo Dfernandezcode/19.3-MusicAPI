@@ -108,11 +108,11 @@ router.get("/:id", async (req, res) => {
 
 //  Endpoint para buscar un playList por el title ( modelo.findById({firstName: name})) (CRUD: Operación Custom. No es CRUD):
 
-router.get("/title/:title", async (req, res) => {
-  const title = req.params.title;
+router.get("/name/:name", async (req, res) => {
+  const name = req.params.name;
   // Si funciona la lectura...
   try {
-    const playList = await Playlist.find({ title: new RegExp("^" + title.toLowerCase(), "i") }).populate([
+    const playList = await Playlist.find({ name: new RegExp("^" + name.toLowerCase(), "i") }).populate([
       "createdBy",
       "songs",
       {
